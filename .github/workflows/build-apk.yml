@@ -1,4 +1,4 @@
-name: Universal WebToApp Builder
+name: Ultimate App Engine
 
 on:
   workflow_dispatch:
@@ -10,60 +10,49 @@ on:
       package_id:
         description: 'Package ID'
         required: true
-        default: 'com.droidforge.builder'
-      source_type:
-        description: 'Source Type (url or html)'
-        required: true
-        default: 'url'
-      web_url:
-        description: 'Target Website URL (if url mode)'
-        required: false
-        default: 'https://google.com'
+        default: 'com.universal.app'
       html_content:
-        description: 'Custom HTML Code (if html mode)'
-        required: false
+        description: 'Custom HTML/JS Code'
+        required: true
         default: ''
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container:
       image: beevelop/cordova:latest
 
     steps:
-      - name: Create App Project
+      - name: Create Complete Android Project
         run: |
           cordova create myApp ${{ github.event.inputs.package_id }} "${{ github.event.inputs.app_name }}"
           cd myApp
           cordova platform add android
+          cordova plugin add cordova-plugin-whitelist
+          cordova plugin add cordova-plugin-android-permissions
+          cordova plugin add cordova-plugin-media
+          cordova plugin add cordova-plugin-camera
 
-          if [ "${{ github.event.inputs.source_type }}" = "html" ] && [ -n "${{ github.event.inputs.html_content }}" ]; then
-            printf "%s" "${{ github.event.inputs.html_content }}" > www/index.html
-          else
-            cat << 'EOF' > www/index.html
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta http-equiv="refresh" content="0; url=${{ github.event.inputs.web_url }}">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body { background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-                </style>
-            </head>
-            <body>
-                <p>Loading application...</p>
-            </body>
-            </html>
-          EOF
-          fi
+          # Inject Hardware Acceleration & Permissions in Config
+          sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
+          sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
 
-      - name: Build APK File
+          # Decode HTML content safely
+          mkdir -p www
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
+
+      - name: Build Standalone APK
         run: |
           cd myApp
           cordova build android --debug
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Publish Direct Public Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: Real-Installable-APK
-          path: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
+          tag_name: latest-build
+          name: "Direct APK Build"
+          files: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
