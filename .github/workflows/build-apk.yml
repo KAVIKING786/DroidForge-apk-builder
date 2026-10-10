@@ -11,10 +11,18 @@ on:
         description: 'Package ID'
         required: true
         default: 'com.droidforge.builder'
-      web_url:
-        description: 'Target Website URL'
+      source_type:
+        description: 'Source Type (url or html)'
         required: true
+        default: 'url'
+      web_url:
+        description: 'Target Website URL (if url mode)'
+        required: false
         default: 'https://google.com'
+      html_content:
+        description: 'Custom HTML Code (if html mode)'
+        required: false
+        default: ''
 
 jobs:
   build-apk:
@@ -48,22 +56,25 @@ jobs:
           cd myApp
           cordova platform add android@12.0.0
 
-          # Configure app name and web URL redirection
-          cat << 'EOF' > www/index.html
-          <!DOCTYPE html>
-          <html>
-          <head>
-              <meta http-equiv="refresh" content="0; url=${{ github.event.inputs.web_url }}">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                  body { background: #0b0f17; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-              </style>
-          </head>
-          <body>
-              <p>Loading application...</p>
-          </body>
-          </html>
+          if [ "${{ github.event.inputs.source_type }}" = "html" ] && [ -n "${{ github.event.inputs.html_content }}" ]; then
+            printf "%s" "${{ github.event.inputs.html_content }}" > www/index.html
+          else
+            cat << 'EOF' > www/index.html
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta http-equiv="refresh" content="0; url=${{ github.event.inputs.web_url }}">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { background: #0b0f17; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
+                </style>
+            </head>
+            <body>
+                <p>Loading application...</p>
+            </body>
+            </html>
           EOF
+          fi
 
       - name: Build Standalone Real APK
         run: |
