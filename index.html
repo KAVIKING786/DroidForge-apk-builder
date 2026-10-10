@@ -1,92 +1,174 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DroidForge — Universal Web to APK Builder</title>
+  <title>DroidForge Studio - Universal Web to APK Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
   <style>
-    body { background-color: #0b0f17; font-family: system-ui, -apple-system, sans-serif; }
-    .glass-card { background: rgba(22, 27, 34, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    body { background-color: #0b0f19; font-family: system-ui, -apple-system, sans-serif; color: #f1f5f9; }
+    .glass-box { background: rgba(18, 24, 38, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .tab-active { background: #0284c7; color: #ffffff; }
   </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col items-center justify-center p-4 sm:p-6">
+<body class="min-h-screen p-4 sm:p-6 flex flex-col items-center">
 
-  <div class="w-full max-w-xl glass-card rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+  <div class="w-full max-w-3xl space-y-6">
     
-    <!-- Header -->
-    <div class="flex items-center gap-3 border-b border-gray-800 pb-4">
-      <div class="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-2xl font-bold">🚀</div>
-      <div>
-        <h1 class="text-xl font-black text-white">DroidForge <span class="text-sky-400">Builder</span></h1>
-        <p class="text-xs text-gray-400">Convert Any Website / HTML to Real Android APK</p>
+    <div class="glass-box rounded-2xl p-5 flex items-center justify-between shadow-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-2xl font-bold">⚡</div>
+        <div>
+          <h1 class="text-xl font-black tracking-wide text-white">DroidForge <span class="text-sky-400">Studio Pro</span></h1>
+          <p class="text-xs text-gray-400">Universal Web / HTML to Android APK Generator</p>
+        </div>
       </div>
+      <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-bold uppercase tracking-wider">v2.5 Ready</span>
     </div>
 
-    <!-- Configuration Form -->
-    <div class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold text-gray-300 mb-1">செயலியின் பெயர் (App Name) *</label>
-        <input id="appName" type="text" value="My App" placeholder="உதா: Cinema Player" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-400 outline-none">
+    <div class="grid grid-cols-2 gap-2 bg-gray-900/60 p-1.5 rounded-xl border border-gray-800">
+      <button onclick="setTab('builder')" id="tabBuilder" class="py-2.5 text-xs font-bold rounded-lg transition tab-active">Universal App Builder</button>
+      <button onclick="setTab('player')" id="tabPlayer" class="py-2.5 text-xs font-bold rounded-lg text-gray-400 transition hover:text-white">Live Stream Tester</button>
+    </div>
+
+    <div id="builderSection" class="glass-box rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+      
+      <div class="border-b border-gray-800 pb-3">
+        <h2 class="text-base font-bold text-white">1. App Details</h2>
       </div>
 
-      <div>
-        <label class="block text-xs font-semibold text-gray-300 mb-1">Package ID *</label>
-        <input id="packageId" type="text" value="com.droidforge.app" placeholder="com.example.app" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-400 outline-none font-mono text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">App Name *</label>
+          <input id="appName" type="text" value="Universal Cinema App" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-400 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Package ID *</label>
+          <input id="packageId" type="text" value="com.droidforge.universal" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-xs font-mono text-white focus:border-sky-400 outline-none">
+        </div>
       </div>
 
-      <div>
-        <label class="block text-xs font-semibold text-gray-300 mb-1">இணையதள முகவரி (Target URL) *</label>
-        <input id="webUrl" type="url" value="https://google.com" placeholder="https://yourwebsite.com" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-400 outline-none">
+      <div class="border-t border-gray-800 pt-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-semibold text-gray-300">2. Source Mode *</label>
+          <div class="flex gap-4 text-xs">
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="srcType" value="html" checked onchange="toggleSource(this.value)" class="text-sky-500"> Custom HTML Code
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="srcType" value="url" onchange="toggleSource(this.value)" class="text-sky-500"> Website URL
+            </label>
+          </div>
+        </div>
+
+        <div id="htmlBox">
+          <textarea id="htmlCode" rows="8" placeholder="Paste your HTML, CSS, JS code here..." class="w-full bg-black/60 border border-gray-700 rounded-xl p-3.5 text-xs font-mono text-emerald-400 focus:border-sky-400 outline-none"><!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App</title>
+  <style>
+    body { background: #0b0f19; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; }
+    h1 { color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <h1>App Ready</h1>
+  <p>Universal Web to APK</p>
+</body>
+</html></textarea>
+        </div>
+
+        <div id="urlBox" class="hidden">
+          <input id="webUrl" type="url" placeholder="https://example.com" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-400 outline-none">
+        </div>
       </div>
 
-      <!-- Action Button -->
-      <button id="buildBtn" onclick="triggerBuild()" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-extrabold py-3.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
-        <span>⚙️ Build Android APK</span>
+      <div class="border-t border-gray-800 pt-4 space-y-4">
+        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">3. UI & Settings</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Orientation</label>
+            <select id="orientation" class="w-full bg-black/50 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-sky-400 outline-none">
+              <option value="default">Auto</option>
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Full Screen</label>
+            <select id="fullscreen" class="w-full bg-black/50 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-sky-400 outline-none">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="startBuild()" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-sky-500/20 text-sm flex items-center justify-center gap-2">
+        <span>Generate Real Android APK</span>
       </button>
+
+      <div id="statusContainer" class="hidden bg-black/60 border border-gray-800 rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-sky-400 font-semibold flex items-center gap-2">
+            Configuration Ready
+          </span>
+        </div>
+        <p class="text-xs text-gray-400">Click below to open Actions page and run the build workflow.</p>
+        <a id="actionLink" href="https://github.com/KAVIKING786/DroidForge-apk-builder/actions/workflows/build-apk.yml" target="_blank" class="w-full block text-center bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-3 rounded-xl text-sm transition">
+          Go to Actions & Build APK
+        </a>
+      </div>
     </div>
 
-    <!-- Status Box -->
-    <div id="statusBox" class="hidden bg-gray-900/80 border border-gray-800 rounded-2xl p-4 space-y-3">
-      <div class="flex items-center justify-between text-xs">
-        <span id="statusText" class="text-sky-400 font-semibold flex items-center gap-2">
-          <span class="animate-spin">⏳</span> பில்ட் தயாராகிறது...
-        </span>
-        <span id="percentText" class="text-gray-400 font-mono">தயாராகிறது...</span>
+    <div id="playerSection" class="hidden glass-box rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="border-b border-gray-800 pb-3">
+        <h2 class="text-base font-bold text-white">Live Video Player Tester</h2>
+        <p class="text-xs text-gray-400">Test m3u8, HLS, or MP4 streams before building</p>
       </div>
 
-      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-        <div id="progressBar" class="bg-sky-400 h-full w-1/4 transition-all duration-500"></div>
+      <div class="flex gap-2">
+        <input id="streamUrl" type="url" placeholder="Enter stream URL (.m3u8 / .mp4)" class="flex-1 bg-black/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-400 outline-none">
+        <button onclick="playVideo()" class="bg-sky-500 hover:bg-sky-400 text-black font-bold px-5 py-2.5 rounded-xl text-xs">Play</button>
       </div>
 
-      <div id="downloadContainer" class="hidden pt-2">
-        <a id="downloadLink" href="#" target="_blank" class="w-full block text-center bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2.5 rounded-xl text-xs transition">
-          📥 நேரடி Actions பக்கத்தில் APK பதிவிறக்கம் செய்ய (Download)
-        </a>
+      <div class="rounded-2xl overflow-hidden bg-black border border-gray-800 aspect-video flex items-center justify-center">
+        <video id="liveVideo" class="video-js vjs-default-skin w-full h-full" controls preload="auto"></video>
       </div>
     </div>
 
   </div>
 
   <script>
-    function triggerBuild() {
-      const appName = document.getElementById('appName').value.trim() || 'My App';
-      const webUrl = document.getElementById('webUrl').value.trim();
-      const statusBox = document.getElementById('statusBox');
-      const downloadContainer = document.getElementById('downloadContainer');
-      const downloadLink = document.getElementById('downloadLink');
+    let playerInstance = null;
 
-      if (!webUrl) {
-        alert("தயவுசெய்து சரியான இணையதள முகவரியை (URL) உள்ளிடவும்!");
-        return;
+    function setTab(tab) {
+      document.getElementById('builderSection').classList.toggle('hidden', tab !== 'builder');
+      document.getElementById('playerSection').classList.toggle('hidden', tab !== 'player');
+      document.getElementById('tabBuilder').className = `py-2.5 text-xs font-bold rounded-lg transition ${tab === 'builder' ? 'tab-active' : 'text-gray-400'}`;
+      document.getElementById('tabPlayer').className = `py-2.5 text-xs font-bold rounded-lg transition ${tab === 'player' ? 'tab-active' : 'text-gray-400'}`;
+    }
+
+    function toggleSource(type) {
+      document.getElementById('htmlBox').classList.toggle('hidden', type !== 'html');
+      document.getElementById('urlBox').classList.toggle('hidden', type !== 'url');
+    }
+
+    function startBuild() {
+      document.getElementById('statusContainer').classList.remove('hidden');
+    }
+
+    function playVideo() {
+      const url = document.getElementById('streamUrl').value.trim();
+      if (!url) return alert('Enter stream URL');
+      if (!playerInstance) {
+        playerInstance = videojs('liveVideo');
       }
-
-      statusBox.classList.remove('hidden');
-      downloadContainer.classList.remove('hidden');
-      
-      // Actions page link
-      downloadLink.href = "https://github.com/KAVIKING786/DroidForge-apk-builder/actions/workflows/build-apk.yml";
-      downloadLink.innerText = "🚀 Actions பக்கத்திற்குச் சென்று 'Run workflow' அழுத்தி APK எடுக்க";
+      playerInstance.src({ src: url, type: url.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4' });
+      playerInstance.play();
     }
   </script>
 </body>
