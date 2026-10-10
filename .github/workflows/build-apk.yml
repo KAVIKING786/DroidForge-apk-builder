@@ -43,10 +43,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup Android SDK Environment
-        uses: android-actions/setup-android@v3
+      - name: Accept Built-in Android Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      - name: Install Cordova Engine
+      - name: Install Cordova CLI
         run: |
           npm install -g cordova
 
@@ -66,7 +67,7 @@ jobs:
                 <meta http-equiv="refresh" content="0; url=${{ github.event.inputs.web_url }}">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { background: #0b0f17; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
+                    body { background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
                 </style>
             </head>
             <body>
@@ -76,12 +77,12 @@ jobs:
           EOF
           fi
 
-      - name: Build Standalone Real APK
+      - name: Build Android Debug APK
         run: |
           cd myApp
           cordova build android --debug
 
-      - name: Upload Real Installable APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Real-Installable-APK
